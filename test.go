@@ -2,31 +2,40 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
-	"sync"
-	"time"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 )
 
-var wait sync.WaitGroup
-var count = 0
+var db *sqlx.DB
 
-var lock sync.Mutex
+type Person struct {
+	UserId   string `db:"id"`
+	Username string `db:"name"`
+	Age      int    `db:"age"`
+	Address  string `db:"address"`
+}
 
-func main() {
-	wait.Add(10)
-	for i := 0; i < 10; i++ {
-		go func(data *int) {
-			lock.Lock()
-			time.Sleep(time.Millisecond * time.Duration(rand.Intn(1000)))
-			temp := *data
-			time.Sleep(time.Millisecond * time.Duration(rand.Intn(1000)))
-			ans := 1
-			*data = temp + ans
-			fmt.Println(*data)
-			lock.Unlock()
-			wait.Done()
-		}(&count)
+func init() {
+	conn, err := sqlx.Open("mysql", "root:Zhaook123!@tcp(127.0.0.1:3306)/data")
+	if err != nil {
+		fmt.Println("Open mysql failed", err)
+		return
 	}
-	wait.Wait()
-	fmt.Println("最终结果", count)
+	db = conn
+}
+func main() {
+	list()
+	defer db.Close()
+}
+func list() {
+	var persons []Person
+	err := db.Select(&persons, "select * from user")
+	if err != nil {
+		fmt.Println("list err", err)
+		return
+	}
+	for _, person := range persons {
+		fmt.Printf("list succ,%+v\n", person)
+	}
 }
