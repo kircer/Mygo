@@ -7,8 +7,8 @@
       "request": "launch",
       "url": "http://localhost:5173",
       "webRoot": "${workspaceFolder}/vue/src",
-      "preLaunchTask": "vite: dev",
-      "postDebugTask": "vite: stop"
+      "preLaunchTask": "fullstack: dev",
+      "postDebugTask": "fullstack: stop"
     }
   ]
 }
